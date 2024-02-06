@@ -6,51 +6,11 @@
     ViewData["Title"] = "Početna";
     var Registrations = (Dictionary<int, int>)ViewData["RegisteredForExam"];
 }
-
-@section SideMenu {
-    <ul class="list-unstyled ps-0">
-        <li class="mb-1">
-            <a class="btn align-items-center rounded-active" onmouseover="this.style.backgroundColor='lightblue'" onmouseout="this.style.backgroundColor='white'" asp-controller="Home" asp-action="Index">Početna</a>
-        </li>
-        <li class="mb-1">
-            <button class="btn btn-toggle align-items-center rounded collapsed text-decoration-none" onmouseover="this.style.backgroundColor='lightblue'" onmouseout="this.style.backgroundColor='white'" data-bs-toggle="collapse" data-bs-target="#home-collapse1" aria-expanded="true">
-                <i class="fa-solid fa-arrow-right" style="font-size: 1rem;"></i>
-                Izvještaji
-            </button>
-            <div class="collapse" id="home-collapse1">
-                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small" style="padding-left: 1rem;">
-                    <!--Display all courses a teacher is teaching-->
-                    @foreach (var course in ViewBag.Courses)
-                    {
-                        <li>
-                            <a asp-controller="Course" asp-action="CourseStatus" asp-route-id="@course.ID" class="link-dark rounded text-decoration-none" onmouseover="this.style.backgroundColor='lightblue'" onmouseout="this.style.backgroundColor='white'">@course.Name</a>
-                        </li>
-                    }
-                </ul>
-            </div>
-        </li>
-        <li class="mb-1">
-            <button class="btn btn-toggle align-items-center rounded collapsed text-decoration-none" onmouseover="this.style.backgroundColor='lightblue'" onmouseout="this.style.backgroundColor='white'" data-bs-toggle="collapse" data-bs-target="#home-collapse2" aria-expanded="true">
-                <i class="fa-solid fa-arrow-right" style="font-size: 1rem;"></i>
-                Unos rezultata studenata
-            </button>
-            <div class="collapse" id="home-collapse2">
-                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small" style="padding-left: 1rem;">
-                    <!-- For each course in Model.CourseNames display a link to the course page-->
-                    @foreach (var course in ViewBag.Courses)
-                    {
-                         <li>
-                            <a asp-controller="StudentExam" asp-action="TeacherInput" asp-route-id="@course.ID" class="link-dark rounded text-decoration-none" onmouseover="this.style.backgroundColor='lightblue'" onmouseout="this.style.backgroundColor='white'">@course.Name</a>
-                         </li>
-                    }
-                </ul>
-            </div>
-        </li>
-        <li class="mb-1">
-            <a class="btn align-items-center rounded text-decoration-none" onmouseover="this.style.backgroundColor='lightblue'" onmouseout="this.style.backgroundColor='white'" asp-controller="Exam" asp-action="Index" data-viewbag="@ViewBag.">Ispiti</a>
-        </li>
-    </ul>
+@section SideMenu{
+    @await Html.PartialAsync("_TeacherHomePartial")
 }
+
+
 @if (SignInManager.IsSignedIn(User))
 {
     <h1 class="pb-5">Dobro došli, @User.Identity?.Name!</h1>
