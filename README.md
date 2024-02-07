@@ -3,7 +3,7 @@
 
 **Tim Zamger**
 
-**http://zamger-001-site1.atempurl.com/**
+**[http://zamger-001-site1.atempurl.com/](https://zamgeris.azurewebsites.net/)**
 
 Članovi tima: Nedim Džajić, Nihad Baberović, Edwin Graca, Ajdin Šuta, Ada Džanko
 
