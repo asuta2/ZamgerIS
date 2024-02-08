@@ -8,10 +8,10 @@ namespace ooadproject.Models
         protected override ValidationResult IsValid
         (object date, ValidationContext validationContext)
         {
-            return ((DateTime)date >= DateTime.Now.AddDays(-14) &&
-           (DateTime)date <= DateTime.Now)
+            return ((DateTime)date >= DateTime.Now &&
+           (DateTime)date <= DateTime.Now.AddDays(14))
             ? ValidationResult.Success
-            : new ValidationResult("Validan je upis između 14 dana u prošlosti i danas!");
+            : new ValidationResult("Validan je upis između danas i 14 dana u budućnosti!");
         }
     }
 
