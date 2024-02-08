@@ -24,18 +24,13 @@ namespace ooadproject.Controllers
             _gradesManager = new GradesManager(_context);
         }
 
-        public List<SelectListItem>  GetTeacherNamesList()
+        public List<SelectListItem> GetTeacherNamesList()
         {
-            List<SelectListItem> Teachers = new List<SelectListItem>();
-
-            foreach (var item in _context.Teacher)
-            {
-                Teachers.Add(new SelectListItem() { Text = $"{item.Title} {item.FirstName} {item.LastName}", Value = item.Id.ToString() });
-            }
-
-            return Teachers;
-
+            return _context.Teacher
+                .Select(item => new SelectListItem() { Text = $"{item.Title} {item.FirstName} {item.LastName}", Value = item.Id.ToString() })
+                .ToList();
         }
+
         [Authorize(Roles = "StudentService")]
         public async Task<IActionResult> Index()
         {
