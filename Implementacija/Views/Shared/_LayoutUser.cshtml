@@ -3,23 +3,23 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ooadproject</title>
+    <title>@ViewData["Title"] - ZamgerIS</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ooadproject.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/font-awesome/css/all.css" />
+    <link rel="icon" href="~/graduation-cap-solid.svg" />
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand fs-5" asp-area="" asp-controller="Home" asp-action="Index">
+                <a class="navbar-brand fs-5 d-inline-block align-text-top" asp-area="" asp-controller="Home" asp-action="Index">
                     <i class="fa-solid fa-graduation-cap fa-2x"></i>
+                    <span style="font-size: 1.8em;">Zamger</span>
                 </a>
 
-                <a class="navbar-brand fs-1" asp-area="" asp-controller="Home" asp-action="Index">Zamger</a>
-
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggleExternalContent" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -33,8 +33,8 @@
     </header>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-2">
-                <h1>Menu</h1>
+            <div class="col-md-2 collapse-sm d-sm-block collapse" id="navbarToggleExternalContent">
+ 
                 @RenderSection("SideMenu", required: false)
             </div>
             <main role="main" class="col-md-9">

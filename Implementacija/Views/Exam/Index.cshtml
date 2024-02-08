@@ -24,32 +24,32 @@
             <th>
                 Prijavljeno
             </th>
-            <th></th>
+            <th class="text-center"></th>
         </tr>
     </thead>
     <tbody>
-
-@foreach (var item in Model) {
+        @foreach (var item in Model) {
             var name = item.Course.Name;
             <tr>
-            <td>
-                @Html.DisplayFor(modelItem => name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Type)
-            </td>
-            <td>
+                <td>
+                    @Html.DisplayFor(modelItem => name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td>
                     @Html.DisplayFor(modelItem => item.Time)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => Registrations[item.ID])
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Uredi</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Detalji</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Izbriši</a>
-            </td>
-        </tr>}
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => Registrations[item.ID])
+                </td>
+                <td class="text-center">
+                    <a asp-action="Edit" asp-route-id="@item.ID">Uredi</a> |
+                    <a asp-action="Details" asp-route-id="@item.ID">Detalji</a> |
+                    <a asp-action="Delete" asp-route-id="@item.ID">Izbriši</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 <h1 class="pb-4">Kreiraj ispit</h1>

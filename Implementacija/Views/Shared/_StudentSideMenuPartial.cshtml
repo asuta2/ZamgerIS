@@ -1,13 +1,17 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
+@{
+    var controller = ViewContext.RouteData.Values["controller"].ToString();
+    var action = ViewContext.RouteData.Values["action"].ToString();
+}
 <ul class="list-unstyled ps-0">
     <li class="mb-1">
-        <a class="btn align-items-center rounded-active" onmouseover="this.style.backgroundColor='lightblue'" onmouseout="this.style.backgroundColor='white'" asp-controller="Home" asp-action="Index">Početna</a>
+        <a class="btn align-items-center rounded-active active" onmouseover="this.style.backgroundColor='lightblue'" onmouseout="this.style.backgroundColor='white'" asp-controller="Home" asp-action="Index">Početna</a>
     </li>
 
     <li class="mb-1">
-        <button class="btn btn-toggle align-items-center rounded collapsed text-decoration-none" onmouseover="this.style.backgroundColor='lightblue'" onmouseout="this.style.backgroundColor='white'" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="true">
+        <button class="btn btn-toggle align-items-center rounded collapsed text-decoration-none" onmouseover="this.style.backgroundColor='lightblue'" onmouseout="this.style.backgroundColor='white'" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="true" aria-current ="true">
             <i class="fa-solid fa-arrow-right" style="font-size: 1rem;"></i>
             Predmeti
         </button>
@@ -30,6 +34,6 @@
         <a class="btn align-items-center rounded text-decoration-none" onmouseover="this.style.backgroundColor='lightblue'" onmouseout="this.style.backgroundColor='white'" asp-controller="ExamRegistration" asp-action="Index">Prijava ispita</a>
     </li>
     <li class="mb-1">
-        <a class="btn align-items-center rounded text-deco" onmouseover="this.style.backgroundColor='lightblue'" onmouseout="this.style.backgroundColor='white'" asp-controller="StudentCourse" asp-action="StudentOverallStatus">Pregled rezultata studija</a>
+        <a class="btn align-items-center rounded text-decoration-none" onmouseover="this.style.backgroundColor='lightblue'" onmouseout="this.style.backgroundColor='white'" asp-controller="StudentCourse" asp-action="StudentOverallStatus">Pregled rezultata studija</a>
     </li>
 </ul>
