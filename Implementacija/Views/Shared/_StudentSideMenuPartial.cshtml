@@ -11,13 +11,12 @@
     </li>
 
     <li class="nav-item mb-1">
-        <div class="dropdown">
-            <button class="btn btn-toggle align-items-center rounded collapsed text-decoration-none text-start text-sm" onmouseover="this.style.backgroundColor='lightblue'" onmouseout="this.style.backgroundColor='white'" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="true" aria-current="true">
+        <button class="btn btn-toggle align-items-center rounded collapsed text-decoration-none text-sm text-sm-start" onmouseover="this.style.backgroundColor='lightblue'" onmouseout="this.style.backgroundColor='white'" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="true" aria-current="true" style="min-width:200px;">
                 <i class="fa-solid fa-arrow-right" style="font-size: 1rem;"></i>
                 Predmeti
             </button>
             <div class="collapse text-start" id="home-collapse">
-                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small" style="padding-left: 1rem;">
+            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small" style="padding-left: 1rem; text-align: center;">
                     @foreach (var course in ViewBag.Courses)
                     {
                         <li>
@@ -27,7 +26,6 @@
                     }
                 </ul>
             </div>
-        </div>
     </li>
     <li class="nav-item  mb-1">
         <a class="btn align-items-center rounded text-decoration-none text-start text-sm" onmouseover="this.style.backgroundColor='lightblue'" onmouseout="this.style.backgroundColor='white'" asp-controller="Request" asp-action="StudentRequests">Aktuelni zahtjevi</a>
