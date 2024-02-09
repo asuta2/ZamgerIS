@@ -8,16 +8,16 @@
 @if (SignInManager.IsSignedIn(User))
 {
     <li>
-                <a class="btn" asp-controller="Home" asp-action="Index">
-                    <i class="fas fa-bell"></i>
-                </a>
+        <a class="btn" asp-controller="Home" asp-action="Index">
+            <i class="fas fa-bell"></i>
+        </a>
     </li>
     <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Zdravo @User.Identity?.Name!</a>
+        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Zdravo @User.Identity?.Name!</a>
     </li>
     <li class="nav-item">
-        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Odjavi se</button>
+        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <button type="submit" class="nav-link btn btn-link text-dark" onmouseover="this.style.backgroundColor='#E67474'" onmouseout="this.style.backgroundColor='white'">Odjavi se</button>
         </form>
     </li>
 }
