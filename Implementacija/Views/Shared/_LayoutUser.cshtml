@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ooadproject.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" type="text/css" href="~/css/sidemenu.css">
     <link rel="stylesheet" href="~/font-awesome/css/all.css" />
     <link rel="icon" href="~/graduation-cap-solid.svg" />
 </head>
@@ -33,7 +34,7 @@
     </header>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-2 collapse-sm d-sm-block collapse" id="navbarToggleExternalContent">
+            <div class="col-md-2 collapse-sm d-sm-block collapse " id="navbarToggleExternalContent">
  
                 @RenderSection("SideMenu", required: false)
             </div>
@@ -52,6 +53,24 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            var isAnimating = false;
+
+            $(".btn-toggle").click(function (e) {
+                if (isAnimating) {
+                    e.preventDefault();
+                } else {
+                    isAnimating = true;
+                    $(this).toggleClass('rotate');
+                    setTimeout(function () {
+                        isAnimating = false;
+                    }, 300); 
+                }
+            });
+        });
+
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
