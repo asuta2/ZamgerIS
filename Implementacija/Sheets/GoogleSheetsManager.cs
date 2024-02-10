@@ -28,7 +28,7 @@ public class GoogleSheetsManager
         using (var stream = new FileStream(ClientSecretFilePath, FileMode.Open, FileAccess.Read))
         {
             credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                GoogleClientSecrets.Load(stream).Secrets,
+                GoogleClientSecrets.FromStream(stream).Secrets,
                 Scopes,
                 "user",
                 CancellationToken.None,
