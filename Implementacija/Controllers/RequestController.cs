@@ -35,7 +35,7 @@ namespace ooadproject.Controllers
                 {
                     Text = value.GetType().GetMember(value.ToString()).First()
                            .GetCustomAttribute<DisplayAttribute>()
-                           .GetName(), // Set the display name of the enum value
+                           .GetName(),
                     Value = ((int)value).ToString()
                 })
                 .ToList();
@@ -49,7 +49,9 @@ namespace ooadproject.Controllers
                 .Cast<RequestStatus>()
                 .Select(value => new SelectListItem
                 {
-                    Text = value.ToString(),
+                    Text = value.GetType().GetMember(value.ToString()).First()
+                           .GetCustomAttribute<DisplayAttribute>()
+                           .GetName(),
                     Value = ((int)value).ToString()
                 })
                 .ToList();
