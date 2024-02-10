@@ -20,4 +20,5 @@ Nastavnik unosi bodove sa zadaća i ispita, a postoji i opcija izmjene već unes
 
 Studentska služba vrši dodavanje novih studenata i nastavnika u sistem, kao i obradu zahtjeva studenata za ovjerenim uvjerenjima.
 
-
+Testni slučajevi:
+Student: test@gmail.com password
