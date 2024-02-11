@@ -12,7 +12,7 @@
 <h2 class="pt-3">Grupni unos rezultata</h2>
 <div class="row mb-3">
     <div class="col-md-4">
-        <form asp-action="SaveExamResults">
+        <form id="saveExamResultsForm" method="post">
             <div class="form-group">
                 <label class="control-label pb-1 pt-3">Ispit</label>
                 <!--Kasnije kada se doda Homework, pridodati na ovo i Homework-->
@@ -22,11 +22,48 @@
             <div class="form-group">
                 <label for="linkInput" class="control-label pb-1 pt-3">Link</label>
                 <input type="url" class="form-control" id="linkInput" placeholder="Unesite spreadsheet link" name="link">
+                <span id="linkError" class="text-danger mt-2"></span>
             </div>
 
             <button type="submit" class="btn btn-primary mt-3">Unesi</button>
         </form>
+        <div id="successMessage" class="alert alert-success mt-3" style="display: none;"></div>
     </div>
 </div>
 
+<script>
+    $('#linkInput').on('input', function () {
+        $('#linkError').text('');
+    });
+
+    $('#saveExamResultsForm').on('submit', function (e) {
+        e.preventDefault();
+        var url = '@Url.Action("SaveExamResults", "StudentExam")';
+        var data = $(this).serialize();
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: data,
+            success: function (response) {
+                $('#linkError').text('');
+                $('#linkInput').text('');
+
+                $('#successMessage').text('Uspješno sačuvano!');
+                $('#successMessage').show();
+
+                setTimeout(function () {
+                    $('#successMessage').hide();
+                }, 5000);
+            },
+            error: function (jqXHR) {
+                if (jqXHR.status === 400) {
+                    var response = JSON.parse(jqXHR.responseText);
+
+                    $('#linkError').text(response.link);
+                }
+            }
+        });
+    });
+</script>
 
