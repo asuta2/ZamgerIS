@@ -58,14 +58,28 @@ namespace ooadproject.Controllers
             var applicationDbContext = _context.StudentExam.Include(s => s.Course).Include(s => s.Exam);
             return View(await applicationDbContext.ToListAsync());
         }
-      
+
         [HttpPost]
         public async Task<IActionResult> SaveExamResults(int id, string link)
         {
+            if (string.IsNullOrEmpty(link))
+            {
+                return BadRequest(new { link = "Link ne može biti prazan!" });
+            }
+
             var exam = await _context.Exam.FindAsync(id);
-            await _examManager.SaveExamResults(exam, link);
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                await _examManager.SaveExamResults(exam, link);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new { link = ex.Message });
+            }
+            
+            return Ok();
         }
+
         // GET: StudentExam/Details/5
         public async Task<IActionResult> Details(int? id)
         {
