@@ -27,7 +27,6 @@ namespace ooadproject.Controllers
         [Authorize(Roles = "StudentService")]
         public async Task<IActionResult> Index()
         {
-
             var applicationDbContext = _context.StudentCourse.Include(s => s.Course).Include(s => s.Student);
             return View(await applicationDbContext.ToListAsync());
         }
@@ -59,7 +58,6 @@ namespace ooadproject.Controllers
         public IActionResult Create()
         {
             ViewData["CourseID"] = new SelectList(_context.Course, "ID", "Name");
-
 
             List<SelectListItem> Students = new List<SelectListItem>();
 
@@ -108,7 +106,7 @@ namespace ooadproject.Controllers
             {
                 _context.StudentCourse.Remove(studentCourse);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
@@ -116,92 +114,92 @@ namespace ooadproject.Controllers
         public async Task<IActionResult> StudentCourseStatus(int? id)
         {
             var user = await _userManager.GetUserAsync(User);
-            var courses = await _context.StudentCourse.Include(sc => sc.Course).Where(sc => sc.StudentID == user.Id).ToListAsync();
-            var StudentCourse = await _context.StudentCourse.FindAsync(id);
-            StudentCourse.Course.Teacher = await _context.Teacher.FindAsync(StudentCourse.Course.TeacherID);
-            //Set Teacher for every StudentCourse.Course
-            foreach (var item in courses)
-            {
-                item.Course.Teacher = await _context.Teacher.FindAsync(item.Course.TeacherID);
-            }
-   
-            var StudentExams = await _context.StudentExam.Where(se => se.CourseID == id).ToListAsync();
-            var StudentHomeworks = await _context.StudentHomework.Where(sh => sh.CourseID == id).ToListAsync();
 
-            var Activities = new List<IActivity>();
+            var studentCourse = await _context.StudentCourse
+                .Include(sc => sc.Course)
+                .Include(sc => sc.Course.Teacher)
+                .FirstOrDefaultAsync(sc => sc.ID == id && sc.StudentID == user.Id);
+
+            if (studentCourse == null)
+            {
+                return NotFound();
+            }
 
             var studentExams = await _context.StudentExam
-            .Include(se => se.Exam)
-            .Where(se => se.CourseID == id)
-            .Select(se => new { se.PointsScored, se.Exam.TotalPoints })
-            .ToListAsync();
+                .Include(se => se.Exam)
+                .Where(se => se.CourseID == id)
+                .ToListAsync();
 
             var studentHomeworks = await _context.StudentHomework
                 .Include(sh => sh.Homework)
                 .Where(sh => sh.CourseID == id)
-                .Select(sh => new { sh.PointsScored, sh.Homework.TotalPoints })
                 .ToListAsync();
 
-            double scored = studentExams.Sum(se => se.PointsScored) + studentHomeworks.Sum(sh => sh.PointsScored);
-            double maxPossible = studentExams.Sum(se => se.TotalPoints) + studentHomeworks.Sum(sh => sh.TotalPoints);
+            var activities = new List<IActivity>();
 
-            double Total = 0;
+            double scored = 0;
+            double maxPossible = 0;
 
-            foreach (StudentExam item in StudentExams)
+            foreach (var studentExam in studentExams)
             {
-                Activities.Add(item);
-                item.Exam = await _context.Exam.FindAsync(item.ExamID);
-                Total += item.GetTotalPoints();
-            }
-            foreach (StudentHomework item in StudentHomeworks)
-            {
-                Activities.Add(item);
-                item.Homework = await _context.Homework.FindAsync(item.HomeworkID);
-                Total += item.GetTotalPoints();
+                studentExam.Exam = await _context.Exam.FindAsync(studentExam.ExamID);
+                activities.Add(studentExam);
+                scored += studentExam.PointsScored;
+                maxPossible += studentExam.Exam.TotalPoints;
             }
 
-            // ovdje sve sto treba za ovaj view
-            ViewData["Courses"] = courses;
-            ViewData["StudentCourse"] = StudentCourse;
-            ViewData["Activities"] = Activities;
+            foreach (var studentHomework in studentHomeworks)
+            {
+                studentHomework.Homework = await _context.Homework.FindAsync(studentHomework.HomeworkID);
+                activities.Add(studentHomework);
+                scored += studentHomework.PointsScored;
+                maxPossible += studentHomework.Homework.TotalPoints;
+            }
+
+            ViewData["Courses"] = await _context.StudentCourse
+                .Include(sc => sc.Course)
+                .Where(sc => sc.StudentID == user.Id)
+                .ToListAsync();
+
+            ViewData["StudentCourse"] = studentCourse;
+            ViewData["Activities"] = activities;
             ViewData["PointsScored"] = scored;
             ViewData["TotalPoints"] = scored;
             ViewData["MaxPossible"] = maxPossible;
+
             return View();
         }
         [Authorize(Roles = "Student")]
-        //View that shows the status of all courses for a student based on the year of study
         public async Task<IActionResult> StudentOverallStatus(int? id)
         {
             var user = await _userManager.GetUserAsync(User);
-            var courses = await _context.StudentCourse.Include(sc => sc.Course).Where(sc => sc.StudentID == user.Id).ToListAsync();
+            var courses = await _context.StudentCourse
+                .Include(sc => sc.Course)
+                .Where(sc => sc.StudentID == user.Id && sc.Grade > 5)
+                .ToListAsync();
 
-            //Create a set of courses where the grade is bigger than 5
-            var CoursesWithGrade = new List<StudentCourse>();
-            foreach (var item in courses)
-            {
-                if (item.Grade > 5)
-                {
-                    CoursesWithGrade.Add(item);
-                }
-            }
-            ViewData["GradedCourses"] = CoursesWithGrade.OrderByDescending(c => c.Course.Semester).ThenBy(c => c.Course.Name).ToList();
+            var gradedCourses = courses
+                .OrderByDescending(c => c.Course.Semester)
+                .ThenBy(c => c.Course.Name)
+                .ToList();
+
+            ViewData["GradedCourses"] = gradedCourses;
             ViewData["Courses"] = courses;
-            //Calculate the average grade for all courses
-            double AverageGrade = 0;
-            foreach (var item in CoursesWithGrade)
+
+            double averageGrade = 0;
+            if (gradedCourses.Any())
             {
-                AverageGrade += item.Grade;
+                averageGrade = gradedCourses.Average(c => c.Grade);
             }
-            AverageGrade /= CoursesWithGrade.Count;
-            ViewData["AverageGrade"] = AverageGrade;
+
+            ViewData["AverageGrade"] = averageGrade;
 
             return View();
         }
 
         private bool StudentCourseExists(int id)
         {
-          return (_context.StudentCourse?.Any(e => e.ID == id)).GetValueOrDefault();
+            return (_context.StudentCourse?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }

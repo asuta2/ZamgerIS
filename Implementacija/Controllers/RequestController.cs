@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -10,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ooadproject.Data;
 using ooadproject.Models;
+using System.Reflection;
 
 namespace ooadproject.Controllers
 {
@@ -26,39 +29,36 @@ namespace ooadproject.Controllers
 
         public List<SelectListItem> GetRequestTypesList()
         {
-            List<SelectListItem> Types = new List<SelectListItem>();
-            var EnumValues = Enum.GetValues(typeof(RequestType));
-
-            foreach (var value in EnumValues)
-            {
-                Types.Add(new SelectListItem
+            var enumValues = Enum.GetValues(typeof(RequestType))
+                .Cast<RequestType>()
+                .Select(value => new SelectListItem
                 {
-                    Text = value.ToString(),
+                    Text = value.GetType().GetMember(value.ToString()).First()
+                           .GetCustomAttribute<DisplayAttribute>()
+                           .GetName(),
                     Value = ((int)value).ToString()
-                });
-            }
+                })
+                .ToList();
 
-            return Types;
-
+            return enumValues;
         }
+
         public List<SelectListItem> GetRequestStatusList()
         {
-            //Get all request types from enum of model RequestStatus
-            List<SelectListItem> Types = new List<SelectListItem>();
-            var EnumValues = Enum.GetValues(typeof(RequestStatus));
-            foreach (var value in EnumValues)
-            {
-                Types.Add(new SelectListItem
+            var enumValues = Enum.GetValues(typeof(RequestStatus))
+                .Cast<RequestStatus>()
+                .Select(value => new SelectListItem
                 {
-                    Text = value.ToString(),
+                    Text = value.GetType().GetMember(value.ToString()).First()
+                           .GetCustomAttribute<DisplayAttribute>()
+                           .GetName(),
                     Value = ((int)value).ToString()
-                });
-            }
-                    
+                })
+                .ToList();
 
-            return Types;
-
+            return enumValues;
         }
+
         [Authorize(Roles = "StudentService")]
         public async Task<IActionResult> Index()
         {
@@ -67,7 +67,6 @@ namespace ooadproject.Controllers
                 .Where(r => r.Status == RequestStatus.Pending)
                 .OrderBy(r => r.RequestTime)
                 .ToListAsync();
-            //Get all requests a student has made where the RequestStatus is not pending
             var Processed = await _context.Request.Include(r => r.Processor).Include(r => r.Requester)
                 .Where(r => r.Status != RequestStatus.Pending)
                 .OrderByDescending(r => r.RequestTime)
@@ -105,10 +104,13 @@ namespace ooadproject.Controllers
 
 
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["RequestTypes"] = GetRequestTypesList();
-            ViewData["RequestStatus"] = GetRequestStatusList();
+            var user = await _userManager.GetUserAsync(User);
+            var Courses = await _context.StudentCourse.Include(sc => sc.Course).Where(sc => sc.StudentID == user.Id).ToListAsync();
+
+            ViewData["RequestTypes"] = GetRequestTypesList();     
+            ViewData["Courses"] = Courses;
             return View();
         }
 

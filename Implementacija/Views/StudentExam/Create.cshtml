@@ -1,7 +1,7 @@
 ﻿@model ooadproject.Models.StudentExam
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Dodaj poene";
 }
 @section SideMenu {
     @await Html.PartialAsync("_TeacherHomePartial")
@@ -25,11 +25,6 @@
                 <label asp-for="PointsScored" class="control-label">Osvojeni poeni</label>
                 <input asp-for="PointsScored" class="form-control" />
                 <span asp-validation-for="PointsScored" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check mb-2">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsPassed" /> Da li je položio?
-                </label>
             </div>
             <div class="form-group mb-1">
                 <input type="submit" value="Dodaj" class="btn btn-primary" />

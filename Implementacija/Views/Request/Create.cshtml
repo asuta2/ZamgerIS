@@ -6,7 +6,9 @@
 }
 
 <h1>Kreiraj novi zahtjev</h1>
-
+@section SideMenu {
+    @await Html.PartialAsync("_StudentSideMenuPartial")
+}
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -28,7 +30,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Vrati se</a>
+    <a asp-action="StudentRequests">Vrati se</a>
 </div>
 
 @section Scripts {

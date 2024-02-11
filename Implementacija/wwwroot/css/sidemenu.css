@@ -1,0 +1,17 @@
+﻿@media (max-width: 576px) {
+    .text-sm {
+        font-size: 1.2rem;
+    }
+    .text-sm-sub{
+        font-size: 1rem;
+    }
+}
+
+.fa-arrow-right {
+    transition: transform 0.3s ease;
+}
+
+.btn-toggle.rotate .fa-arrow-right {
+    transform: rotate(90deg);
+}
+

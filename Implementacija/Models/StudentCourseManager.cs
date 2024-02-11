@@ -37,16 +37,6 @@ namespace ooadproject.Models
             var hworks = await _context.StudentHomework.Where(e => e.CourseID == courseID).ToListAsync();
 
 
-            double total = 0;
-            foreach (var exam in exams)
-            {
-                total += exam.PointsScored;
-            }
-
-            foreach (var hwork in hworks)
-            {
-                total += hwork.PointsScored;
-            }
             foreach (var student in AllStudentCourses)
             {
                 var item = new StudentCourseInfo(); 

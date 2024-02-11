@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ooadproject.Data;
@@ -40,10 +36,20 @@ namespace ooadproject.Controllers
             var user = await _userManager.GetUserAsync(User);
             var courses = await _context.Course.Where(c => c.TeacherID == user.Id).ToListAsync();
             var currentCourse = await _context.Course.FindAsync(id);
-            var exams = await _context.Exam.Include(e => e.Course).Where(e => courses.Contains(e.Course)).ToListAsync();
-            ViewData["Exams"] = new SelectList(exams,"ID","Type");
+            var exams = await _context.Exam
+                .Where(e => e.CourseID == currentCourse.ID)
+                .ToListAsync();
+
+            var examSelectListItems = exams.Select(e => new SelectListItem
+            {
+                Text = $"{e.Type} - {e.Time:yyyy-MM-dd}",
+                Value = e.ID.ToString()
+            }).ToList();
+
+            ViewData["Exams"] = new SelectList(examSelectListItems, "Value", "Text");
             ViewData["CurrentCourse"] = currentCourse;
             ViewData["Courses"] = courses;
+
             return View();
         }
        
@@ -52,14 +58,28 @@ namespace ooadproject.Controllers
             var applicationDbContext = _context.StudentExam.Include(s => s.Course).Include(s => s.Exam);
             return View(await applicationDbContext.ToListAsync());
         }
-      
+
         [HttpPost]
         public async Task<IActionResult> SaveExamResults(int id, string link)
         {
+            if (string.IsNullOrEmpty(link))
+            {
+                return BadRequest(new { link = "Link ne može biti prazan!" });
+            }
+
             var exam = await _context.Exam.FindAsync(id);
-            await _examManager.SaveExamResults(exam, link);
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                await _examManager.SaveExamResults(exam, link);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new { link = ex.Message });
+            }
+            
+            return Ok();
         }
+
         // GET: StudentExam/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -81,29 +101,38 @@ namespace ooadproject.Controllers
         }
         public List<SelectListItem> GetFullNames(List<StudentCourse> owo)
         {
-            List<SelectListItem> Students = new List<SelectListItem>();
-
-            foreach (StudentCourse item in owo)
+            return owo.Select(item => new SelectListItem
             {
-                Students.Add(new SelectListItem() { Text = $"{item.Student.FirstName} {item.Student.LastName}", Value = item.ID.ToString() });
-            }
-
-            return Students;
-
+                Text = $"{item.Student.FirstName} {item.Student.LastName}",
+                Value = item.ID.ToString()
+            }).ToList();
         }
 
         // GET: StudentExam/Create
         public async Task<IActionResult> Create(int id)
         {
-            //Get list of students that are enrolled in the course passed by the id as a SelectList which will display the name of the course
-            List<StudentCourse> students = await _context.StudentCourse.Include(s => s.Student).Where(s => s.CourseID == id).ToListAsync();
-            //Get list of exams that are open for the course passed by the id as a SelectList which will display the id of the exam
-            var exams = await _context.Exam.Include(e => e.Course).Where(e => e.CourseID == id).ToListAsync();
-            var user = await _userManager.GetUserAsync(User);
-            var courses = await _context.Course.Where(c => c.TeacherID == user.Id).ToListAsync();
+            var students = await _context.StudentCourse
+                .Include(s => s.Student)
+                .Where(s => s.CourseID == id)
+                .ToListAsync();
+
+            var exams = await _context.Exam
+                .Include(e => e.Course)
+                .Where(e => e.CourseID == id)
+                .ToListAsync();
+
+            var examSelectListItems = exams.Select(e => new SelectListItem
+            {
+                Text = $"{e.Type} - {e.Time:yyyy-MM-dd}",
+                Value = e.ID.ToString()
+            });
+
             ViewData["CourseID"] = new SelectList(GetFullNames(students), "Value", "Text");
-            ViewData["ExamID"] = new SelectList(exams, "ID", "Type");
-            ViewData["Courses"] = courses;
+            ViewData["ExamID"] = new SelectList(examSelectListItems, "Value", "Text");
+            ViewData["Courses"] = await _context.Course
+                .Where(c => c.TeacherID.ToString() == _userManager.GetUserId(User))
+                .ToListAsync();
+
             return View();
         }
 
@@ -112,22 +141,31 @@ namespace ooadproject.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(int id,[Bind("CourseID,ExamID,PointsScored,IsPassed")] StudentExam studentExam)
+        public async Task<IActionResult> Create(int id, [Bind("CourseID,ExamID,PointsScored")] StudentExam studentExam)
         {
-            studentExam.Course = await _context.StudentCourse.FindAsync(studentExam.CourseID);
-            studentExam.Exam = await _context.Exam.FindAsync(studentExam.ExamID);
-
             if (ModelState.IsValid)
             {
+                var exam = await _context.Exam.FindAsync(studentExam.ExamID);
+                studentExam.IsPassed = studentExam.PointsScored >= exam.MinimumPoints;
+                
                 _context.Add(studentExam);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Create));
             }
-            var students = await _context.StudentCourse.Include(s => s.Student).Where(s => s.CourseID == id).ToListAsync();
-            //Get list of exams that are open for the course passed by the id as a SelectList which will display the id of the exam
-            var exams = await _context.Exam.Include(e => e.Course).Where(e => e.CourseID == id).ToListAsync();
+
+            var students = await _context.StudentCourse
+                .Include(s => s.Student)
+                .Where(s => s.CourseID == id)
+                .ToListAsync();
+
+            var exams = await _context.Exam
+                .Include(e => e.Course)
+                .Where(e => e.CourseID == id)
+                .ToListAsync();
+
             ViewData["CourseID"] = new SelectList(students, "ID", "Student.FirstName");
             ViewData["ExamID"] = new SelectList(exams, "ID", "Type");
+
             return View(studentExam);
         }
 

@@ -48,7 +48,10 @@
                     }
                 </td>
                 <td>
-                    <a href="">Poništi</a>
+                    <form asp-action="Delete" asp-route-id="@request.ID" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="submit" class="btn btn-primary" value="Poništi" />
+                    </form>
                 </td>
             </tr>
         }
