@@ -27,30 +27,35 @@ namespace ooadproject.Models
 
         public async Task<List<StudentCourseInfo>> RetrieveStudentCourseInfo(int? courseID)
         {
-            var AllStudentCourses = await _context.StudentCourse.Where(sc => sc.CourseID == courseID).ToListAsync();
-            //For each StudentCourse, put student
+            var AllStudentCourses = await _context.StudentCourse
+                .Include(sc => sc.Student)
+                .Where(sc => sc.CourseID == courseID)
+                .ToListAsync();
 
-            var List = new List<StudentCourseInfo>();
-            //Get all exams and homeworks for this course
-            var exams = await _context.StudentExam.Where(e => e.CourseID == courseID).ToListAsync();
+            var exams = await _context.StudentExam
+                .Where(e => e.CourseID == courseID)
+                .ToListAsync();
 
-            var hworks = await _context.StudentHomework.Where(e => e.CourseID == courseID).ToListAsync();
+            var hworks = await _context.StudentHomework
+                .Where(e => e.CourseID == courseID)
+                .ToListAsync();
 
+            var List = new List<StudentCourseInfo>(AllStudentCourses.Count);
 
             foreach (var student in AllStudentCourses)
             {
-                var item = new StudentCourseInfo(); 
-
-                item.student = student;
-                item.student.Student = await _context.Student.FirstOrDefaultAsync(s => s.Id == student.StudentID);
-                item.TotalPoints = await GetTotalPoints(student.ID);
+                var item = new StudentCourseInfo
+                {
+                    student = student,
+                    TotalPoints = await GetTotalPoints(student.ID)
+                };
                 item.Grade = await EvualuateGrade(item.TotalPoints);
+
                 List.Add(item);
             }
-            
-            return List;
 
-        }   
+            return List;
+        }
         public async Task<int> GetNumberOfPassed(List<StudentCourseInfo> temp)
         {
             //For each item, check if grade is 6 or above
