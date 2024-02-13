@@ -176,43 +176,36 @@ namespace ooadproject.Controllers
         [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> CourseStatus(int? id)
         {
-            var user = await _userManager.GetUserAsync(User);
-            var courses = await _context.Course.Where(c => c.Teacher == user).ToListAsync();
-            var course = await _context.Course.FindAsync(id);
-            ViewData["course"] = course;
-            ViewData["Courses"] = courses;
-            /*
-            
-            var StudentCourses = await _context.StudentCourse.Where(sc => sc.Course == course).ToListAsync();
-            var Students = new List<Student>();
-            var user = await _userManager.GetUserAsync(User);
-            var Courses = await _context.Course.Where(c => c.Teacher == user).ToListAsync();
-            foreach (var item in StudentCourses)
+            if (id == null)
             {
-                Students.Add(item.Student);
+                return NotFound();
             }
 
-            var Exams = await _context.Exam.Where(e => e.Course == course).ToListAsync();
+            var user = await _userManager.GetUserAsync(User);
+            var course = await _context.Course.FindAsync(id);
 
-            var Homeworks = await _context.Homework.Where(h => h.Course == course).ToListAsync();
+            if (course == null || course.Teacher.Id != user.Id)
+            {
+                return NotFound();
+            }
 
-            
-            ViewData["Courses"] = Courses;
-            ViewData["StudentCourses"] = StudentCourses;
-            ViewData["Students"] = Students;
-            ViewData["Exams"] = Exams;
-            ViewData["Homeworks"] = Homeworks;
-            */
-            var students = await _context.StudentCourse.Where(sc => sc.Course == course).ToListAsync();
-            List<StudentCourseInfo> list = await _courseManager.RetrieveStudentCourseInfo(id);
+            var studentCourses = await _context.StudentCourse
+                .CountAsync(sc => sc.CourseID == id);
+
+            var list = await _courseManager.RetrieveStudentCourseInfo(id);
+
+            ViewData["course"] = course;
             ViewData["Info"] = list;
-            ViewData["Maximum"] =  await _courseManager.GetMaximumPoints(id);
+            ViewData["Maximum"] = await _courseManager.GetMaximumPoints(id);
             ViewData["NumberOfPassed"] = await _courseManager.GetNumberOfPassed(list);
-            ViewData["NumberOfStudents"] = students.Count;
-
+            ViewData["NumberOfStudents"] = studentCourses;
+            ViewData["Courses"] = await _context.Course
+                .Where(c => c.Teacher.Id == user.Id)
+                .ToListAsync();
 
             return View();
         }
+
 
 
     }
