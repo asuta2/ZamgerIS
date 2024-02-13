@@ -19,12 +19,12 @@
                 <hr />
                 <div asp-validation-summary="ModelOnly" class="text-danger" style="font-weight: bold; font-size: 16px; margin-top: 10px;"></div>
                 <div class="form-floating  pb-3">
-                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" />
+                    <input asp-for="Input.Email" type="email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
                     <label asp-for="Input.Email" class="form-label"></label>
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>
                 <div class="form-floating pb-2">
-                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" />
+                    <input asp-for="Input.Password" type="password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Password"/>
                     <label asp-for="Input.Password" class="form-label"></label>
                     <span asp-validation-for="Input.Password" class="text-danger"></span>
                 </div>
