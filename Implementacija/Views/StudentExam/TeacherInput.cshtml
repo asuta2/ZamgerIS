@@ -25,7 +25,10 @@
                 <span id="linkError" class="text-danger mt-2"></span>
             </div>
 
-            <button type="submit" class="btn btn-primary mt-3">Unesi</button>
+            <button type="submit" class="btn btn-primary mt-3" id="submitButton">
+                <span class="" id="span1" aria-hidden="true"></span>
+                <span role="status" id="span2">Unesi</span>
+            </button>
         </form>
         <div id="successMessage" class="alert alert-success mt-3" style="display: none;"></div>
     </div>
@@ -35,11 +38,20 @@
     $('#linkInput').on('input', function () {
         $('#linkError').text('');
     });
+    
+    var submitButton = $('#submitButton');
+    var spinnerSpan = submitButton.find('#span1');
+    var statusSpan = submitButton.find('#span2');    
+   
 
     $('#saveExamResultsForm').on('submit', function (e) {
         e.preventDefault();
         var url = '@Url.Action("SaveExamResults", "StudentExam")';
         var data = $(this).serialize();
+
+        spinnerSpan.addClass('spinner-border spinner-border-sm');
+        submitButton.prop('disabled', true);
+        statusSpan.text('Dodavanje...');
 
         $.ajax({
             url: url,
@@ -62,6 +74,11 @@
 
                     $('#linkError').text(response.link);
                 }
+            },
+            complete: function () {
+                spinnerSpan.removeClass('spinner-border spinner-border-sm');
+                statusSpan.text("Unesi");
+                submitButton.prop('disabled', false);
             }
         });
     });
