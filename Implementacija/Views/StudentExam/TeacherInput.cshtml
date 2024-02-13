@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ooadproject.Models.ExamRegistration>
+﻿@model TeacherInputViewModel
 @{
     ViewData["Title"] = ViewBag.CurrentCourse.Name;
 }
@@ -7,7 +7,36 @@
 }
 <h1 class="pb-3">@ViewBag.CurrentCourse.Name</h1>
 <h2 class="pb-3">Pojedinačni unos rezultata</h2>
-<a class="btn btn-primary" asp-controller="StudentExam" asp-action="Create" asp-route-id="@ViewBag.CurrentCourse.ID">Unesi rezultat</a>
+<div class="row">
+    <div class="col-md-4">
+        <form id ="createStudentExamForm" class="needs-validation" novalidate asp-action="Create" asp-controller="StudentExam">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group mb-2">
+                <label asp-for="StudentExam.CourseID" class="control-label">Ime studenta</label>
+                <select asp-for="StudentExam.CourseID" class="form-control" asp-items="ViewBag.Students"></select>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="StudentExam.ExamID" class="control-label">Naziv ispita</label>
+                <select asp-for="StudentExam.ExamID" class="form-control" asp-items="ViewBag.Exams"></select>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="StudentExam.PointsScored" class="control-label">Osvojeni poeni</label>
+                <input asp-for="StudentExam.PointsScored" required class="form-control" />
+                <div class="invalid-feedback">
+                    Unesite osvojene poene.
+                </div>
+                <span asp-validation-for="StudentExam.PointsScored" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-1">
+                <button type="submit" id="createStudentExamButton" class="btn btn-primary">
+                    Dodaj
+                </button>
+            </div>
+        </form>
+        <span id="linkError1" class="text-danger mt-2"></span>
+        <div id="successMessage1" class="alert alert-success mt-3" style="display: none;"></div>
+    </div>
+</div>
 
 <h2 class="pt-3">Grupni unos rezultata</h2>
 <div class="row mb-3">
@@ -38,11 +67,74 @@
     $('#linkInput').on('input', function () {
         $('#linkError').text('');
     });
-    
+
     var submitButton = $('#submitButton');
     var spinnerSpan = submitButton.find('#span1');
-    var statusSpan = submitButton.find('#span2');    
-   
+    var statusSpan = submitButton.find('#span2');
+    var createStudentExamButton = $('#createStudentExamButton');
+
+    (function () {
+        'use strict'
+
+        var forms = document.querySelectorAll('.needs-validation')
+
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })();
+
+    $(document).ready(function () {
+        var form = $('#createStudentExamForm');
+        var button = $('#createStudentExamButton');
+
+        var updateButtonStatus = function () {
+            button.prop('disabled', !form[0].checkValidity());
+        };
+
+        form.find('input,select,textarea').on('input change', updateButtonStatus);
+
+        updateButtonStatus();
+    });
+
+    $('#createStudentExamForm').on('submit', function (e) {
+        e.preventDefault();
+        var url = '@Url.Action("Create", "StudentExam")';
+        var data = $(this).serialize();
+
+        createStudentExamButton.prop('disabled', true);
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: data,
+            success: function (response) {
+                $('#successMessage1').text('Uspješno sačuvano!').show();
+
+                setTimeout(function () {
+                    $('#successMessage1').hide();
+                }, 5000);
+            },
+            error: function (jqXHR) {
+                if (jqXHR.status === 400) {
+                    var response = JSON.parse(jqXHR.responseText);
+
+                    $('#linkError1').text(response.link);
+                }
+            },
+            complete: function () {
+                createStudentExamButton.prop('disabled', false);
+            }
+        });
+    });
+
 
     $('#saveExamResultsForm').on('submit', function (e) {
         e.preventDefault();
@@ -61,8 +153,7 @@
                 $('#linkError').text('');
                 $('#linkInput').text('');
 
-                $('#successMessage').text('Uspješno sačuvano!');
-                $('#successMessage').show();
+                $('#successMessage').text('Uspješno sačuvano!').show();
 
                 setTimeout(function () {
                     $('#successMessage').hide();

@@ -34,6 +34,10 @@ namespace ooadproject.Controllers
         public async Task<IActionResult> TeacherInput(int id)
         {
             var user = await _userManager.GetUserAsync(User);
+            var students = await _context.StudentCourse
+                .Include(s => s.Student)
+                .Where(s => s.CourseID == id)
+                .ToListAsync();
             var courses = await _context.Course.Where(c => c.TeacherID == user.Id).ToListAsync();
             var currentCourse = await _context.Course.FindAsync(id);
             var exams = await _context.Exam
@@ -49,6 +53,8 @@ namespace ooadproject.Controllers
             ViewData["Exams"] = new SelectList(examSelectListItems, "Value", "Text");
             ViewData["CurrentCourse"] = currentCourse;
             ViewData["Courses"] = courses;
+            ViewData["Students"] = new SelectList(GetFullNames(students), "Value", "Text");
+
 
             return View();
         }
@@ -150,23 +156,10 @@ namespace ooadproject.Controllers
                 
                 _context.Add(studentExam);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Create));
+                return Ok();
             }
 
-            var students = await _context.StudentCourse
-                .Include(s => s.Student)
-                .Where(s => s.CourseID == id)
-                .ToListAsync();
-
-            var exams = await _context.Exam
-                .Include(e => e.Course)
-                .Where(e => e.CourseID == id)
-                .ToListAsync();
-
-            ViewData["CourseID"] = new SelectList(students, "ID", "Student.FirstName");
-            ViewData["ExamID"] = new SelectList(exams, "ID", "Type");
-
-            return View(studentExam);
+            return BadRequest("Desila se greška");
         }
 
         // GET: StudentExam/Edit/5
