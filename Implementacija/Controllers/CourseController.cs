@@ -197,7 +197,7 @@ namespace ooadproject.Controllers
             ViewData["course"] = course;
             ViewData["Info"] = list;
             ViewData["Maximum"] = await _courseManager.GetMaximumPoints(id);
-            ViewData["NumberOfPassed"] = await _courseManager.GetNumberOfPassed(list);
+            ViewData["NumberOfPassed"] = _courseManager.GetNumberOfPassed(list);
             ViewData["NumberOfStudents"] = studentCourses;
             ViewData["Courses"] = await _context.Course
                 .Where(c => c.Teacher.Id == user.Id)

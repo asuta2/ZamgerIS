@@ -49,94 +49,73 @@ namespace ooadproject.Models
                     student = student,
                     TotalPoints = await GetTotalPoints(student.ID)
                 };
-                item.Grade = await EvualuateGrade(item.TotalPoints);
+                item.Grade = EvaluateGrade(item.TotalPoints);
 
                 List.Add(item);
             }
 
             return List;
         }
-        public async Task<int> GetNumberOfPassed(List<StudentCourseInfo> temp)
+        public int GetNumberOfPassed(List<StudentCourseInfo> temp)
         {
-            //For each item, check if grade is 6 or above
-            int count = 0;
-            foreach (var item in temp)
-            {
-                if(item.Grade >= 6)
-                {
-                    count++;
-                }
-            }
-            return count;
+            return temp.Count(item => item.Grade >= 6);
         }
-        public async Task<int> EvualuateGrade(double points)
+        public int EvaluateGrade(double points)
         {
-            if(points >= 95)
+            if (points >= 95)
             {
                 return 10;
             }
-            else if(points >= 85)
+            else if (points >= 85)
             {
                 return 9;
             }
-            else if(points >= 75)
+            else if (points >= 75)
             {
                 return 8;
             }
-            else if(points >= 65)
+            else if (points >= 65)
             {
                 return 7;
             }
-            else if(points >=55)
+            else if (points >= 55)
             {
                 return 6;
             }
             else
             {
                 return 0;
-            }   
+            }
         }
-        public  async Task<double> GetTotalPoints(int courseID)
+        public async Task<double> GetTotalPoints(int courseID)
         {
-            var exams = await _context.StudentExam.Where(e => e.CourseID == courseID).ToListAsync();
-
-            var hworks = await _context.StudentHomework.Where(e => e.CourseID == courseID).ToListAsync();
-
             double total = 0;
-            foreach (var exam in exams)
-            {
-                total += exam.PointsScored;
-            }
 
-            foreach (var hwork in hworks)
-            {
-                total += hwork.PointsScored;
-            }
+            total += await _context.StudentExam
+                .Where(e => e.CourseID == courseID)
+                .SumAsync(e => e.PointsScored);
+
+            total += await _context.StudentHomework
+                .Where(e => e.CourseID == courseID)
+                .SumAsync(e => e.PointsScored);
 
             return total;
-
         }
 
 
-        public  async Task<double> GetMaximumPoints(int? courseID)
+        public async Task<double> GetMaximumPoints(int? courseID)
         {
-            var exams = await _context.Exam.Where(e => e.CourseID == courseID).ToListAsync();
-            
-            var hworks = await _context.Homework.Where(e => e.CourseID == courseID).ToListAsync();
-
             double total = 0;
-            foreach (var exam in exams)
-            {
-                total += exam.TotalPoints;
-            }
 
-            foreach (var hwork in hworks)
-            {
-                total += hwork.TotalPoints;
-            }
+            total += await _context.Exam
+                .Where(e => e.CourseID == courseID)
+                .SumAsync(e => e.TotalPoints);
+
+            total += await _context.Homework
+                .Where(e => e.CourseID == courseID)
+                .SumAsync(e => e.TotalPoints);
 
             return total;
-
         }
 
     }
