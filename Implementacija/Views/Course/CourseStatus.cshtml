@@ -15,12 +15,23 @@
 </head>
 <body>
     <h1 class="pb-5">@ViewBag.course.Name</h1>
-    <div class="progress" style="border: 1px solid black; height: 2rem; width: 80vw; margin: auto;">
-        <div class="progress-bar" role="progressbar" aria-valuenow="@((ViewBag.NumberOfPassed/ViewBag.NumberOfStudents)*100)" aria-valuemin="0" aria-valuemax="100" style="width: @(Convert.ToDouble(ViewBag.NumberOfPassed) / Convert.ToDouble(ViewBag.NumberOfStudents) * 100)%; ">
+    @if (ViewBag.NumberOfStudents > 0)
+    {
+        <div class="progress" style="border: 1px solid black; height: 2rem; width: 80vw; margin: auto;">
+            <div class="progress-bar" role="progressbar" aria-valuenow="@((ViewBag.NumberOfPassed/ViewBag.NumberOfStudents)*100)" aria-valuemin="0" aria-valuemax="100" style="width: @(Convert.ToDouble(ViewBag.NumberOfPassed) / Convert.ToDouble(ViewBag.NumberOfStudents) * 100)%; ">
+            </div>
         </div>
-    </div>
+    }
+    else
+    {
+        <h3 class="pt-2 pb-2 ">Trenutno nema studenata na kursu!</h3>
+    }
 
-    <h3 class="pt-2" style="text-align:center;">Položilo je @ViewBag.NumberOfPassed/@ViewBag.NumberOfStudents studenata</h3>
+
+    @if (ViewBag.NumberOfStudents > 0)
+    {
+        <h3 class="pt-2 pb-3" style="text-align:center;">Položilo je @ViewBag.NumberOfPassed/@ViewBag.NumberOfStudents studenata</h3>
+    }
     <table class="table table-bordered pb-5">
         <tr>
             <th>Indeks</th>
