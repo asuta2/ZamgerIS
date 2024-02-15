@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ooadproject.Models.Exam>
+﻿@model ExamViewModel
 
 @{
     ViewData["Title"] = "Ispiti";
@@ -7,9 +7,51 @@
 @section SideMenu {
     @await Html.PartialAsync("_TeacherHomePartial")
 }
-<h1 class="pb-4">Aktuelni ispiti</h1>
 
-<table class="table table-bordered border-dark">
+<h1 class="pb-2">Kreiraj ispit</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" class="needs-validation" id="CreateExamForm" novalidate>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group pb-2">
+                <label asp-for="Exam.CourseID" class="control-label pb-1"> Predmet</label>
+                <select asp-for="Exam.CourseID" class="form-control" onmouseover="this.style.cursor='pointer'" asp-items="@(ViewBag.CoursesSelectList as IEnumerable<SelectListItem>)"></select>
+            </div>
+            <div class="form-group pb-2">
+                <label asp-for="Exam.Time" class="control-label pb-1">Vrijeme</label>
+                <input asp-for="Exam.Time" class="form-control" onmouseover="this.style.cursor='pointer'" required />
+                <span asp-validation-for="Exam.Time" class="text-danger"></span>
+            </div>
+            <div class="form-group pb-2">
+                <label asp-for="Exam.Type" class="control-label pb-1">Tip ispita</label>
+                <select asp-for="Exam.Type" class="form-control" asp-items="ViewBag.ExamTypes" onmouseover="this.style.cursor='pointer'"></select>
+                <span asp-validation-for="Exam.Type" class="text-danger"></span>
+            </div>
+            <div class="form-group pb-2">
+                <label asp-for="Exam.TotalPoints" class="control-label pb-1">Ukupno bodova</label>
+                <input asp-for="Exam.TotalPoints" class="form-control" required type="number" />
+                <span asp-validation-for="Exam.TotalPoints" class="text-danger"></span>
+            </div>
+            <div class="form-group pb-2">
+                <label asp-for="Exam.MinimumPoints" class="control-label pb-1">Prag</label>
+                <input asp-for="Exam.MinimumPoints" class="form-control" required type="number" />
+                <span asp-validation-for="Exam.MinimumPoints" class="text-danger"></span>
+            </div>
+            <div class="form-group pt-1">
+                <input type="submit" id="SubmitButton" value="Kreiraj" class="btn btn-primary btn-lg" />
+            </div>
+        </form>
+        <span id="linkError1" class="text-danger mt-3"></span>
+        <div id="successMessage1" class="alert alert-success mt-3" style="display: none;"></div>
+    </div>
+</div>
+
+
+
+<h1 class="pb-4 pt-2">Aktuelni ispiti</h1>
+
+<table class="table table-bordered border-dark table-auto" style="width: auto !important; table-layout: auto !important;">
     <thead>
         <tr>
             <th>
@@ -28,7 +70,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model) {
+        @foreach (var item in Model.ExamList) {
             var name = item.Course.Name;
             <tr>
                 <td>
@@ -46,15 +88,105 @@
                 <td class="text-center">
                     <a asp-action="Edit" asp-route-id="@item.ID">Uredi</a> |
                     <a asp-action="Details" asp-route-id="@item.ID">Detalji</a> |
-                    <a asp-action="Delete" asp-route-id="@item.ID">Izbriši</a>
+                    <a class="delete-link" data-id="@item.ID" style="cursor: pointer;">Izbriši</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
-<h1 class="pb-4">Kreiraj ispit</h1>
+<span id="linkError2" class="text-danger mt-2"></span>
+<div id="successMessage2" class="alert alert-success mt-3" style="display: none;"></div>
+<script>
 
-<div style="padding-left: 20px;">
-    <a class="btn btn-secondary" style="background-color: #0e6efd; color: white;" onmouseover="this.style.backgroundColor='#4c84ff'" onmouseout="this.style.backgroundColor='#0e6efd'" asp-action="Create">Kreiraj novi ispit</a>
-</div>
+    var createExamButton = $('#SubmitButton');
+
+    (function () {
+        'use strict'
+
+        var forms = document.querySelectorAll('.needs-validation');   
+        var linkError = $('#linkError1');
+
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })();
+
+    $('#CreateExamForm').on('submit', function (e) {
+        e.preventDefault();
+        var url = '@Url.Action("Create", "Exam")';
+        var data = $(this).serialize();
+
+        createExamButton.prop('disabled', true);
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: data
+        })
+            .then(response => {
+                createExamButton.prop('disabled', false);
+
+                if (response.ok) {
+                    $('#successMessage1').text('Uspješno sačuvano!').show();
+                    setTimeout(function () {
+                        $('#successMessage1').hide();
+                    }, 3000);
+                    location.reload();
+                } else if (response.status === 400) {
+                    response.json().then(data => {
+                        $('#linkError1').text(data.error);
+                        setTimeout(function () {
+                            $('#linkError1').hide();
+                        }, 5000);
+                    });
+                }
+            });
+    });
+
+    $(document).ready(function () {
+        $(".delete-link").click(function (e) {
+            e.preventDefault();
+
+            if (!confirm("Da li ste sigurni da želite izbrisati ovaj ispit?")) {
+                return;
+            }
+
+            var id = $(this).data("id");
+            var url = '@Url.Action("Delete", "Exam")' + '/' + id;
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                headers: {
+                    'RequestVerificationToken': '@ViewData["RequestVerificationToken"]',
+                    'Content-Type': 'application/json'
+                },
+                success: function () {
+                    $(e.target).closest('tr').remove();
+                    $('#successMessage2').text('Uspješno Izbrisano!').show();
+                    setTimeout(function () {
+                        $('#successMessage2').hide();
+                    }, 3000);
+                },
+                error: function () {
+                    $('#linkError2').text('Desila se greška').show();
+                    setTimeout(function () {
+                        $('#linkError2').hide();
+                    }, 3000);
+                }
+            });
+        });
+    });
+    
+</script>
 

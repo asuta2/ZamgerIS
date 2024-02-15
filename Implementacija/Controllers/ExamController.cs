@@ -1,4 +1,5 @@
 ﻿using MessagePack.Formatters;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ooadproject.Data;
 using ooadproject.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace ooadproject.Controllers
 {
@@ -30,9 +32,10 @@ namespace ooadproject.Controllers
 
             foreach (var value in EnumValues)
             {
+                var displayAttribute = value.GetType().GetField(value.ToString()).GetCustomAttributes(typeof(DisplayAttribute), false).FirstOrDefault() as DisplayAttribute;
                 Types.Add(new SelectListItem
                 {
-                    Text = value.ToString(),
+                    Text = displayAttribute?.Name ?? value.ToString(),
                     Value = ((int)value).ToString()
                 });
             }
@@ -45,7 +48,7 @@ namespace ooadproject.Controllers
             var user = await _userManager.GetUserAsync(User);
 
             var Courses = new List<SelectListItem>();
-            
+
             var UserCourses = await _context.Course.Where(c => c.TeacherID == user.Id).ToListAsync();
             foreach (var item in UserCourses)
             {
@@ -71,9 +74,19 @@ namespace ooadproject.Controllers
             {
                 registered.Add(item.ID, GetExamRegistrations(item.ID));
             }
+
             ViewData["Courses"] = courses;
+            ViewData["CoursesSelectList"] = courses.Select(c => new SelectListItem { Value = c.ID.ToString(), Text = c.Name }).ToList();
             ViewData["RegisteredForExam"] = registered;
-            return View(exams);
+            ViewData["ExamTypes"] = GetExamTypesList();
+            ViewData["RequestVerificationToken"] = HttpContext.RequestServices.GetRequiredService<IAntiforgery>().GetAndStoreTokens(HttpContext).RequestToken;
+
+
+            var viewModel = new ExamViewModel
+            {
+                ExamList = exams
+            };
+            return View(viewModel);
         }
 
         public async Task<IActionResult> Details(int? id)
@@ -98,7 +111,7 @@ namespace ooadproject.Controllers
 
 
         public async Task<IActionResult> Create()
-        {   
+        {
             var user = await _userManager.GetUserAsync(User);
             ViewData["CourseID"] = await GetCourseNamesList();
             ViewData["ExamTypes"] = GetExamTypesList();
@@ -117,10 +130,11 @@ namespace ooadproject.Controllers
                 await _context.SaveChangesAsync();
                 //exam.Attach(_notificationManager);
                 //await exam.Notify();
-                return RedirectToAction(nameof(Index));
+                return Ok(exam);
             }
             ViewData["CourseID"] = new SelectList(_context.Course, "ID", "ID", exam.CourseID);
-            return RedirectToAction(nameof(Index)); 
+            var error = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault()?.ErrorMessage;
+            return BadRequest(new { error = error });
         }
         public async Task<IActionResult> Delete(int? id)
         {
@@ -142,20 +156,16 @@ namespace ooadproject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            if (_context.Exam == null)
-            {
-                return Problem("Entity set 'ApplicationDbContext.Exam'  is null.");
-            }
             var exam = await _context.Exam.FindAsync(id);
-            if (exam != null)
+            if (exam == null)
             {
-                _context.Exam.Remove(exam);
+                return NotFound();
             }
-            var user = await _userManager.GetUserAsync(User);
-            ViewData["Courses"] = await _context.Course.Where(c => c.TeacherID == user.Id).ToListAsync();
 
+            _context.Exam.Remove(exam);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return Ok();
         }
         public async Task<IActionResult> Edit(int? id)
         {
@@ -214,7 +224,7 @@ namespace ooadproject.Controllers
 
         private bool ExamExists(int id)
         {
-          return (_context.Exam?.Any(e => e.ID == id)).GetValueOrDefault();
+            return (_context.Exam?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }
