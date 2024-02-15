@@ -9,7 +9,7 @@
 
 Testni slučajevi:
 
-Student: test@gmail.com password
+Student: test@gmai.com password
 
 Profesor: testprof@test.com password
 
