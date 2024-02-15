@@ -5,6 +5,14 @@
 
 **https://zamgeris.azurewebsites.net**
 
+Testni slučajevi:
+
+Student: test@gmail.com password
+
+Profesor: testprof@test.com password
+
+Studentska Služba: admin@etf.unsa.ba password
+
 Članovi tima: Nedim Džajić, Nihad Baberović, Edwin Graca, Ajdin Šuta, Ada Džanko
 
 **Projekat: Studentski informacioni sistem** 
@@ -20,10 +28,4 @@ Nastavnik unosi bodove sa zadaća i ispita, a postoji i opcija izmjene već unes
 
 Studentska služba vrši dodavanje novih studenata i nastavnika u sistem, kao i obradu zahtjeva studenata za ovjerenim uvjerenjima.
 
-Testni slučajevi:
 
-Student: test@gmail.com password
-
-Profesor: testprof@test.com password
-
-Studentska Služba: admin@etf.unsa.ba password
