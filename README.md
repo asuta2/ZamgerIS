@@ -3,6 +3,8 @@
 
 **Tim Zamger**
 
+---
+
 **https://zamgeris.azurewebsites.net**
 
 Testni slučajevi:
@@ -12,6 +14,8 @@ Student: test@gmail.com password
 Profesor: testprof@test.com password
 
 Studentska Služba: admin@etf.unsa.ba password
+
+---
 
 Članovi tima: Nedim Džajić, Nihad Baberović, Edwin Graca, Ajdin Šuta, Ada Džanko
 
