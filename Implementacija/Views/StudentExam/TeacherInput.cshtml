@@ -123,11 +123,11 @@
                 }, 5000);
             },
             error: function (jqXHR) {
-                if (jqXHR.status === 400) {
-                    var response = JSON.parse(jqXHR.responseText);
+                var response = JSON.parse(jqXHR.responseText);
 
-                    $('#linkError1').text(response.link);
-                }
+                var errorMessage = response.error;
+
+                $('#linkError1').text(errorMessage);
             },
             complete: function () {
                 createStudentExamButton.prop('disabled', false);
@@ -163,7 +163,9 @@
                 if (jqXHR.status === 400) {
                     var response = JSON.parse(jqXHR.responseText);
 
-                    $('#linkError').text(response.link);
+                    var errorMessage = response.error;
+
+                    $('#linkError').text(errorMessage);
                 }
             },
             complete: function () {

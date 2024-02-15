@@ -70,7 +70,7 @@ namespace ooadproject.Controllers
         {
             if (string.IsNullOrEmpty(link))
             {
-                return BadRequest(new { link = "Link ne može biti prazan!" });
+                return BadRequest(new { error = "Link ne može biti prazan!" });
             }
 
             var exam = await _context.Exam.FindAsync(id);
@@ -152,14 +152,23 @@ namespace ooadproject.Controllers
             if (ModelState.IsValid)
             {
                 var exam = await _context.Exam.FindAsync(studentExam.ExamID);
+
+                // Check if the studentExam already exists for that exam
+                var existingStudentExam = await _context.StudentExam.FirstOrDefaultAsync(se => se.ExamID == studentExam.ExamID);
+                if (existingStudentExam != null)
+                {
+                    // Replace the line with a properly formatted JSON response
+                    return BadRequest(new { error = "Vec su uneseni rezultati za studentov ispit." });
+                }
+
                 studentExam.IsPassed = studentExam.PointsScored >= exam.MinimumPoints;
-                
+
                 _context.Add(studentExam);
                 await _context.SaveChangesAsync();
                 return Ok();
             }
 
-            return BadRequest("Desila se greška");
+            return BadRequest(new { error = "Desila se greška" });
         }
 
         // GET: StudentExam/Edit/5
