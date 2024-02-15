@@ -95,6 +95,7 @@ namespace ooadproject.Controllers
                 .ToList();
 
             ViewData["PendingRequests"] = Pending;
+            ViewData["RequestTypes"] = GetRequestTypesList();
             ViewData["ProcessedRequests"] = Processed;
             ViewData["Courses"] = Courses;
 
