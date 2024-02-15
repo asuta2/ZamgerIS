@@ -128,6 +128,9 @@
                 var errorMessage = response.error;
 
                 $('#linkError1').text(errorMessage);
+                setTimeout(function () {
+                    $('#linkError1').text('');
+                }, 4000);
             },
             complete: function () {
                 createStudentExamButton.prop('disabled', false);
@@ -138,6 +141,9 @@
 
     $('#saveExamResultsForm').on('submit', function (e) {
         e.preventDefault();
+        var linkError = $('#linkError');
+        linkError.text('');
+
         var url = '@Url.Action("SaveExamResults", "StudentExam")';
         var data = $(this).serialize();
 
@@ -150,7 +156,7 @@
             type: 'POST',
             data: data,
             success: function (response) {
-                $('#linkError').text('');
+                linkError.text('');
                 $('#linkInput').text('');
 
                 $('#successMessage').text('Uspješno sačuvano!').show();
@@ -165,7 +171,11 @@
 
                     var errorMessage = response.error;
 
-                    $('#linkError').text(errorMessage);
+                    linkError.text(errorMessage).show();
+                    setTimeout(function () {
+                        linkError.text('');
+                    }, 4000);
+                    
                 }
             },
             complete: function () {
