@@ -153,12 +153,15 @@ namespace ooadproject.Controllers
             {
                 var exam = await _context.Exam.FindAsync(studentExam.ExamID);
 
-                // Check if the studentExam already exists for that exam
                 var existingStudentExam = await _context.StudentExam.FirstOrDefaultAsync(se => se.ExamID == studentExam.ExamID);
                 if (existingStudentExam != null)
                 {
-                    // Replace the line with a properly formatted JSON response
                     return BadRequest(new { error = "Vec su uneseni rezultati za studentov ispit." });
+                }
+
+                if (studentExam.PointsScored > exam.TotalPoints)
+                {
+                    return BadRequest(new { error = "Bodovi premašuju maksimalan broj bodova za ispit." });
                 }
 
                 studentExam.IsPassed = studentExam.PointsScored >= exam.MinimumPoints;
