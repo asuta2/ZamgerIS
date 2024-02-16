@@ -80,15 +80,21 @@ namespace ooadproject.Controllers
         {
             studentCourse.Points = 0;
             studentCourse.Grade = 5;
+
+            var existingStudentCourse = await _context.StudentCourse.FirstOrDefaultAsync(sc => sc.CourseID == studentCourse.CourseID && sc.StudentID == studentCourse.StudentID);
+            if (existingStudentCourse != null)
+            {
+                return BadRequest(new { error = "Student je već upisan na ovaj kurs!" });
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(studentCourse);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return Ok();
             }
-            ViewData["CourseID"] = new SelectList(_context.Course, "ID", "ID", studentCourse.CourseID);
-            ViewData["StudentID"] = new SelectList(_context.Student, "Id", "Id", studentCourse.StudentID);
-            return View(studentCourse);
+
+            return BadRequest(new { error = "Desila se greška pri dodavanju studenta na kurs." });
         }
 
         [Authorize(Roles = "StudentService")]
