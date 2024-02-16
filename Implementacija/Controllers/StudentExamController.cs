@@ -80,7 +80,7 @@ namespace ooadproject.Controllers
             }
             catch(Exception ex)
             {
-                return BadRequest(new { link = ex.Message });
+                return BadRequest(new { error = ex.Message });
             }
             
             return Ok();
