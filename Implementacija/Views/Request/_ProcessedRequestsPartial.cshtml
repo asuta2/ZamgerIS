@@ -1,0 +1,30 @@
+﻿@model IEnumerable<ooadproject.Models.Request>
+
+<table class="table table-hover">
+<tr>
+    <th>Zahtjev</th>
+    <th>Student</th>
+    <th>Datum obrade</th>
+    <th></th>
+</tr>
+@foreach (Request request in Model)
+{
+    //Filter student from ViewBag.Students where his id matches request.RequesterID without using LINQ
+    <tr>
+        <td>
+            @if (request.Type == RequestType.PassedExamsTestimony)
+            {
+                @Html.Raw("Uvjerenje o položenim predmetima")
+            }
+            else
+            {
+                @Html.Raw("Potvrda o redovnom studiju")
+            }
+        </td>
+        <!-- Find Student where his id matches request.RequesterID-->
+        <td>@(request.Requester.FirstName) @(request.Requester.LastName)</td>
+        <td>@request.RequestTime</td>
+        <td><a asp-action="Details" asp-route-id="@request.ID">Detalji</a></td>
+    </tr>
+}
+</table>

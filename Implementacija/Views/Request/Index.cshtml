@@ -41,34 +41,47 @@
     }
 </table>
 <h1>Historija zahtjeva</h1>
-<table class="table table-hover">
-    <tr>
-        <th>Zahtjev</th>
-        <th>Student</th>
-        <th>Datum obrade</th>
-        <th></th>
-    </tr>
-    @foreach (Request request in ViewBag.ProcessedRequests)
-    {
-        //Filter student from ViewBag.Students where his id matches request.RequesterID without using LINQ
-        <tr>
-            <td>
-                @if (request.Type == RequestType.PassedExamsTestimony)
-                {
-                    @Html.Raw("Uvjerenje o položenim predmetima")
-                }
-                else
-                {
-                    @Html.Raw("Potvrda o redovnom studiju")
-                }
-            </td>
-            <!-- Find Student where his id matches request.RequesterID-->
-            <td>@(request.Requester.FirstName) @(request.Requester.LastName)</td>
-            <td>@request.RequestTime</td>
-            <td><a asp-action="Details" asp-route-id="@request.ID">Detalji</a></td>
-        </tr>
-    }
-</table>
+<form id="searchForm" asp-controller="Request" asp-action="AllRequests" method="get">
+    <div class="d-flex align-items-center">
+        <input type="text" name="searchString" value="@ViewBag.CurrentFilter" class="form-control" style="max-width: 100%; width: auto;"/>
+        <input type="submit" value="Pretraži" class="btn btn-primary ml-5 " style="margin-left: 10px;" />
+    </div>
+</form>
+<div id="processedRequests">
+    @await Html.PartialAsync("_ProcessedRequestsPartial", Model)
+</div>
+<a id="showAllRequests" asp-controller="Request" asp-action="AllRequests" class="btn btn-primary">Prikaži sve zahtjeve</a>
+
+
+@section Scripts{
+<script>
+        $(document).ready(function () {
+            $('#searchForm').on('submit', function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: this.action,
+                    method: this.method,
+                    data: $(this).serialize(),
+                    success: function (data) {
+                        $('#processedRequests').html(data);
+                    }
+                });
+            });
+
+            $('#showAllRequests').on('click', function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: this.href,
+                    method: 'get',
+                    success: function (data) {
+                        $('#processedRequests').html(data);
+                        $('#showAllRequests').hide();
+                    }
+                });
+            });
+        });
+</script>
+}
 
 
 

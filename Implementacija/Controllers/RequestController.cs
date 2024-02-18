@@ -69,14 +69,38 @@ namespace ooadproject.Controllers
                 .ToList();
             var Processed = requests.Where(r => r.Status != RequestStatus.Pending)
                 .OrderByDescending(r => r.RequestTime)
-                .TakeLast(6)
+                .Take(3)
                 .ToList();
 
             ViewData["PendingRequests"] = Pending;
-            ViewData["ProcessedRequests"] = Processed;
 
-            return View(Pending);
+            return View(Processed);
         }
+
+        [Authorize(Roles = "StudentService")]
+        public async Task<IActionResult> AllRequests(string searchString)
+        {
+            IQueryable<Request> requests = _context.Request.Include(r => r.Processor).Include(r => r.Requester);
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                requests = requests.Where(r => r.Requester.FirstName.Contains(searchString)
+                                               || r.Requester.LastName.Contains(searchString));
+            }
+
+            var processed = await requests.Where(r => r.Status != RequestStatus.Pending)
+                .OrderByDescending(r => r.RequestTime)
+                .AsNoTracking()
+                .ToListAsync();
+
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_ProcessedRequestsPartial", processed);
+            }
+
+            return View("Index", processed);
+        }
+
         [Authorize(Roles = "Student")]
         public async Task<IActionResult> StudentRequests()
         {
