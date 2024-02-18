@@ -28,8 +28,14 @@
                 }
             </td>
             <td>@(request.Requester.FirstName) @(request.Requester.LastName)</td>
-            <td>
-                <a asp-controller="Request" asp-action="Edit" asp-route-id="@request.ID">Obradi</a>
+            <td style="text-align:center;">
+                <form asp-controller="Request" asp-action="EditStatus" asp-route-id="@request.ID" method="post">
+                    <select name="status" class="form-select" onchange="this.form.submit()" style="width: auto; margin: auto;">
+                        <option value="Pending" selected="@(request.Status == RequestStatus.Pending ? "selected" : null)">U obradi</option>
+                        <option value="Accepted" selected="@(request.Status == RequestStatus.Accepted ? "selected" : null)">Prihvaćen</option>
+                        <option value="Rejected" selected="@(request.Status == RequestStatus.Rejected ? "selected" : null)">Odbijen</option>
+                    </select>
+                </form>
             </td>
         </tr>
     }

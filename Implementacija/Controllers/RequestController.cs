@@ -103,7 +103,30 @@ namespace ooadproject.Controllers
             return View();
         }
 
+        [HttpPost, ActionName("EditStatus")]
+        public async Task<IActionResult> Edit(int id, string status)
+        {
+            var request = await _context.Request.FindAsync(id);
+            if (request == null)
+            {
+                return NotFound();
+            }
 
+            if (Enum.TryParse(typeof(RequestStatus), status, out var parsedStatus))
+            {
+                request.Status = (RequestStatus)parsedStatus;
+            }
+            else
+            {
+                return BadRequest("Invalid status value");
+            }
+
+            request.ProcessorID = (await _userManager.GetUserAsync(User)).Id;
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
 
         public async Task<IActionResult> Create()
         {
