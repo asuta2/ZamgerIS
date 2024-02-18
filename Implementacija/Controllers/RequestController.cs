@@ -62,15 +62,15 @@ namespace ooadproject.Controllers
         [Authorize(Roles = "StudentService")]
         public async Task<IActionResult> Index()
         {
+            var requests = await _context.Request.Include(r => r.Processor).Include(r => r.Requester).ToListAsync();
 
-            var Pending = await _context.Request.Include(r => r.Processor).Include(r => r.Requester)
-                .Where(r => r.Status == RequestStatus.Pending)
+            var Pending = requests.Where(r => r.Status == RequestStatus.Pending)
                 .OrderBy(r => r.RequestTime)
-                .ToListAsync();
-            var Processed = await _context.Request.Include(r => r.Processor).Include(r => r.Requester)
-                .Where(r => r.Status != RequestStatus.Pending)
+                .ToList();
+            var Processed = requests.Where(r => r.Status != RequestStatus.Pending)
                 .OrderByDescending(r => r.RequestTime)
-                .ToListAsync();
+                .TakeLast(6)
+                .ToList();
 
             ViewData["PendingRequests"] = Pending;
             ViewData["ProcessedRequests"] = Processed;
