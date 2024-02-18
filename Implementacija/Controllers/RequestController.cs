@@ -143,17 +143,19 @@ namespace ooadproject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,RequesterID,RequestTime,Type,Status,ProcessorID")] Request request)
         {
-            request.RequesterID =   (await _userManager.GetUserAsync(User)).Id;
-            request.RequestTime = DateTime.Now;
+            var user = await _userManager.GetUserAsync(User);
+            request.RequesterID = user.Id;
+            request.RequestTime = DateTime.UtcNow;
             request.ProcessorID = null;
             request.Status = RequestStatus.Pending;
 
             if (ModelState.IsValid)
             {
-                _context.Add(request);
+                await _context.Request.AddAsync(request);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(StudentRequests));
             }
+
             ViewData["RequestTypes"] = GetRequestTypesList();
             ViewData["RequestStatus"] = GetRequestStatusList();
             return View(request);
