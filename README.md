@@ -1,35 +1,46 @@
-** OOAD 22/23 **
+# Zamger Information System
 
 
-**Tim Zamger**
-
----
-
-**https://zamgeris.azurewebsites.net**
-
-Testni slučajevi:
-
-Student: test@gmai.com password
-
-Profesor: testprof@test.com password
-
-Studentska Služba: admin@etf.unsa.ba password
-
----
-
-Članovi tima: Nedim Džajić, Nihad Baberović, Edwin Graca, Ajdin Šuta, Ada Džanko
-
-**Projekat: Studentski informacioni sistem** 
-
-Sistem omogućava upravljanje nastavnim i  administrativnim procesima na fakultetu.
-
-Sistem predviđa tri vrste korisnika: studente, nastavno osoblje i studentsku službu, koji se prijavljuju na sistem svojim pristupnim podacima.
+This is a web application built with ASP.NET Core and Entity Framework Core. It's designed to manage students progress on individual courses to help faculty member organize their data better.
 
 
-Student ima uvid u ostvareni rezultat na svim predmetima koje sluša po svim osnovama: ostvareni bodovi na zadaćama, ostvareni bodovi na ispitima. Student ima uvid i u rezultat na predmetima na kojima je ocjena zaključena, kao i sumarni pregled ostvarenog rezultata na studiju kroz prikaz ocjena iz svih položenih predmeta te prikaz prosjeka po semestrima i godinama. 
+## Live Demo
 
-Nastavnik unosi bodove sa zadaća i ispita, a postoji i opcija izmjene već unesenih bodova. Nastavnik ima kompletan uvid u rezultate svakog studenta koji sluša predmet, kao i zbirne rezultate kroz izvještaj o predmetu. 
+You can view a live demo of the application at [https://zamgeris.azurewebsites.net](https://zamgeris.azurewebsites.net).
 
-Studentska služba vrši dodavanje novih studenata i nastavnika u sistem, kao i obradu zahtjeva studenata za ovjerenim uvjerenjima.
+## Test Cases:
 
+Below are provided some test users which will show the basic functionalities of this application for the following roles:
 
+- **Student**: test@gmai.com password
+
+- **Professor**: testprof@test.com password
+
+- **Student Services**: admin@etf.unsa.ba password
+
+## Features
+
+- **User Authentication**: The application uses ASP.NET Core Identity for user management. It supports roles such as "Student" and "Teacher".
+
+- **Exam Management**: Teachers can create exams for their courses. Students can register for these exams.
+
+- **Homework Management**: Teachers can assign homework to their courses. Students can view and submit homework.
+
+- **Google Sheets Integration**: The application integrates with Google Sheets to manage exam data.
+
+- **Notifications**: The application sends notifications to students when new exams are created.
+
+### Installing
+
+1. Clone the repository
+2. Open the solution in your IDE
+3. Update the database connection string in `appsettings.json`
+4. Run the application
+
+## Authors
+
+- Nedim Džajić
+- Nihad Baberović
+- Edwin Graca
+- Ajdin Šuta
+- Ada Džanko
